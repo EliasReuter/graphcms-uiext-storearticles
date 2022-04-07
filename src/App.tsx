@@ -40,11 +40,14 @@ function App() {
   return(
     <Wrapper declaration={declaration}>
       {
-        storeIds.map(x => 
-          <input value={x}/>
+        storeIds.map((x:any) => 
+        <>
+          <input value={x?.storeId}/>
+          <input value={x?.articleId}/>
+          <br/>
+          </>
         )
       }
-      <input value={storeIds}/>
     </Wrapper>
   );
 }
