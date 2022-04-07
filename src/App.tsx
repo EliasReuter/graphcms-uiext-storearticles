@@ -42,10 +42,10 @@ function App() {
       {
         storeIds.map((x:any) => 
         <>
-          <input value={x?.storeId}/>
-          <input value={x?.articleId}/>
+          <input value={"Store Id: " + x?.storeId}/>
+          <input value={"Article Id: " + x?.articleId}/>
           <br/>
-          </>
+        </>
         )
       }
     </Wrapper>
