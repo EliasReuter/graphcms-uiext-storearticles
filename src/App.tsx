@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {
@@ -7,33 +7,46 @@ import {
   FieldExtensionDeclaration,
   FieldExtensionType,
   FieldExtensionFeature,
+  ExtensionPermission,
+  useFieldExtension,
 } from '@graphcms/uix-react-sdk';
 
 // use the ExtensionDeclaration type to validate the shape of your declaration object
 const declaration: FieldExtensionDeclaration = {
   extensionType: 'field',
   fieldType: FieldExtensionType.STRING,
-  name: 'My first custom input',
+  name: 'Store Article Definition',
   description: '',
   features: [FieldExtensionFeature.FieldRenderer],
+  permissions: [ExtensionPermission.INPUT]
 };
 
-// Create a new type from your declaration object.
-type MyExactDeclarationType = typeof declaration;
+function App() {
 
-// And give it to the hook, allowing it do dynamically type the returned props, reflecting your extension configuration.
-const MyField = () => {
-  const { value, onChange } = useUiExtension<MyExactDeclarationType>();
+  const [storeIds, setStoreIds] = useState([]);
 
-  return (
-    <input value={value} onChange={(event) => onChange(event.target.value)} />
+  useEffect(() => {
+    fetch("https://api-eu-central-1.graphcms.com/v2/cl1eyp2gh2pc901z7amoq8axs/master?query=query%7B%0A%20%20storeArticles%7B%0A%20%20%20%20storeId%0A%20%20%20%20articleId%0A%20%20%7D%0A%7D")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        setStoreIds(result.data.storeArticles);
+      },
+      (error) => {
+      }
+    )
+}, []);
+
+  return(
+    <Wrapper declaration={declaration}>
+      {
+        storeIds.map(x => 
+          <input value={x}/>
+        )
+      }
+      <input value={storeIds}/>
+    </Wrapper>
   );
-};
-
-const App = () => (
-  <Wrapper declaration={declaration}>
-    <MyField />
-  </Wrapper>
-);
+}
 
 export default App;
