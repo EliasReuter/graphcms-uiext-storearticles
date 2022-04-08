@@ -20,7 +20,7 @@ const declaration: FieldExtensionDeclaration = {
   permissions: [ExtensionPermission.INPUT]
 };
 
-function App() {
+const App = () => {
 
   const {
     form: { subscribeToFieldState },
@@ -28,6 +28,8 @@ function App() {
   } = useFieldExtension();
 
   const [graphcmsId, setGraphCmsId] = useState([]);
+
+  
 
   useEffect(() => {
     const unsubscribe = async () => {
@@ -39,7 +41,8 @@ function App() {
         { value: true },
       );
     };
-    //return () => unsubscribe();
+    
+    unsubscribe();
 }, [subscribeToFieldState, field.apiId]);
 
   return(
