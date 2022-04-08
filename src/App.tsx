@@ -21,15 +21,15 @@ const declaration: FieldExtensionDeclaration = {
 
 function App() {
 
-  const fieldExtProps = useFieldExtension();
+  const {form} = useFieldExtension();
 
   const [graphcmsId, setGraphCmsId] = useState("default id");
 
-  /*
+  
   useEffect(() => {
     const unsubscribe = async () => {
-      await fieldExtProps.form.subscribeToFieldState(
-        "ID",
+      await form.subscribeToFieldState(
+        "articleID",
         (state) => {
           setGraphCmsId(state.value);
         },
@@ -37,15 +37,13 @@ function App() {
       );
     };
     unsubscribe();
-  }, [fieldExtProps]);
-  */
-
+  }, [form]);
+  
   console.log(useFieldExtension());
 
   return(
     <Wrapper declaration={declaration}> 
-      <div>asd</div>
-        <input value={"asd"}/>
+        <input value={graphcmsId}/>
     </Wrapper>
   );
 
