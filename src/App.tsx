@@ -25,6 +25,7 @@ function App() {
 
   const [graphcmsId, setGraphCmsId] = useState("default id");
 
+  /*
   useEffect(() => {
     const unsubscribe = async () => {
       await fieldExtProps.form.subscribeToFieldState(
@@ -36,13 +37,14 @@ function App() {
       );
     };
     unsubscribe();
-}, [fieldExtProps]);
+  }, [fieldExtProps]);
+  */
 
+  console.log(useFieldExtension());
 
-  console.log(fieldExtProps);
   return(
     <Wrapper declaration={declaration}> 
-        <input value={graphcmsId}/>
+        <input value={"asd"}/>
     </Wrapper>
   );
 
