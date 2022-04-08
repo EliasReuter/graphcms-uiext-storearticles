@@ -19,7 +19,7 @@ const declaration: FieldExtensionDeclaration = {
   permissions: [ExtensionPermission.INPUT]
 };
 
-const App = () => {
+function App() {
 
   const {
     form: { subscribeToFieldState },
@@ -48,12 +48,6 @@ const App = () => {
     <Wrapper declaration={declaration}> 
       <div className={"ml-10"}>
         <h1 className={"text-3xl font-bold underline mt-10 mb-4"}>Create Article</h1>
-        <div>
-          <label className={"mb-4"}>
-            Id:
-            <input type="text" name="name" value={"graphcmsId"} />
-          </label>
-        </div>
       </div>
     </Wrapper>
   );
