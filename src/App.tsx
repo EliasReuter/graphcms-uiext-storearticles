@@ -29,6 +29,7 @@ const App = () => {
 
   const [graphcmsId, setGraphCmsId] = useState([]);
 
+  /*
   useEffect(() => {
     const unsubscribe = async () => {
       await subscribeToFieldState(
@@ -42,6 +43,7 @@ const App = () => {
     
     unsubscribe();
 }, [subscribeToFieldState, field.id]);
+*/
 
   return(
     <Wrapper declaration={declaration}> 
