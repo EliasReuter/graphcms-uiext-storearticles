@@ -22,33 +22,29 @@ const declaration: FieldExtensionDeclaration = {
 function App() {
 
   const {
-    form: { subscribeToFieldState },
-    field
+    form,
+    model
   } = useFieldExtension();
 
   const [graphcmsId, setGraphCmsId] = useState([]);
 
-  /*
   useEffect(() => {
     const unsubscribe = async () => {
-      await subscribeToFieldState(
-        field.id,
+      await form.subscribeToFieldState(
+        model.id,
         (state) => {
           setGraphCmsId(state.value);
         },
         { value: true },
       );
     };
-    
     unsubscribe();
-}, [subscribeToFieldState, field.id]);
-*/
+}, [form, model.id]);
+
 
   return(
     <Wrapper declaration={declaration}> 
-      <div className={"ml-10"}>
-        <h1 className={"text-3xl font-bold underline mt-10 mb-4"}>Create Article</h1>
-      </div>
+        <input value={graphcmsId}/>
     </Wrapper>
   );
 
