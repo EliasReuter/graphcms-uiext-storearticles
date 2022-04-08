@@ -10,7 +10,6 @@ import {
   useFieldExtension,
 } from '@graphcms/uix-react-sdk';
 
-// use the ExtensionDeclaration type to validate the shape of your declaration object
 const declaration: FieldExtensionDeclaration = {
   extensionType: 'field',
   fieldType: FieldExtensionType.STRING,
@@ -52,7 +51,7 @@ const App = () => {
         <div>
           <label className={"mb-4"}>
             Id:
-            <input type="text" name="name" value={graphcmsId} />
+            <input type="text" name="name" value={"graphcmsId"} />
           </label>
         </div>
       </div>
