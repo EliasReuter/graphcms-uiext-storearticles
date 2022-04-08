@@ -39,7 +39,7 @@ function App() {
       );
     };
     unsubscribe();
-}, [form, model]);
+}, [form, model.id]);
 
 
   return(
