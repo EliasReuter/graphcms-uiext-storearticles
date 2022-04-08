@@ -22,16 +22,15 @@ const declaration: FieldExtensionDeclaration = {
 function App() {
 
   const {
-    form,
-    model
+    form
   } = useFieldExtension();
 
-  const [graphcmsId, setGraphCmsId] = useState([]);
+  const [graphcmsId, setGraphCmsId] = useState("default id");
 
   useEffect(() => {
     const unsubscribe = async () => {
       await form.subscribeToFieldState(
-        model.id,
+        "ID",
         (state) => {
           setGraphCmsId(state.value);
         },
@@ -39,7 +38,7 @@ function App() {
       );
     };
     unsubscribe();
-}, [form, model.id]);
+}, []);
 
 
   return(
