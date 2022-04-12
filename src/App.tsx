@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import {
   Wrapper,
@@ -9,8 +8,6 @@ import {
   ExtensionPermission,
   useFieldExtension,
 } from "@graphcms/uix-react-sdk";
-import Article from "./Models/Article";
-import StoreArticle from "./Models/StoreArticle";
 import {
   ApolloClient,
   ApolloProvider,
@@ -20,56 +17,12 @@ import {
   useQuery,
 } from "@apollo/client";
 import { Button, TextField } from "@mui/material";
-
-const declaration: FieldExtensionDeclaration = {
-  extensionType: "field",
-  fieldType: FieldExtensionType.STRING,
-  name: "Store Article Definition",
-  description: "",
-  features: [FieldExtensionFeature.FieldRenderer],
-  permissions: [ExtensionPermission.INPUT],
-};
-
-const GET_ARTICLES = gql`
-  query GetStoreArticles {
-    storeArticles {
-      storeId
-      articleId
-    }
-  }
-`;
-
-const CREATE_STOREARTICLES = gql`
-  mutation ($articleId: Int!, $storeId: Int!) {
-    createStoreArticle(
-      data: {
-        article: { connect: { articleId: $articleId } }
-        comingsoon: false
-        store: { connect: { storeId: $storeId } }
-        articleId: $articleId
-        storeId: $storeId
-      }
-    ) {
-      id
-    }
-  }
-`;
-
-const PUBLISH_STOREARTICLE = gql`
-  mutation ($sAID: ID!) {
-    publishStoreArticle(where: { id: $sAID }, to: PUBLISHED) {
-      id
-    }
-  }
-`;
-
-const UNPUBLISH_STOREARTICLE = gql`
-  mutation ($sAID: ID!) {
-    unpublishStoreArticle(where: { id: $sAID }, from: PUBLISHED) {
-      id
-    }
-  }
-`;
+import {
+  GET_ARTICLES,
+  CREATE_STOREARTICLES,
+  PUBLISH_STOREARTICLE,
+  UNPUBLISH_STOREARTICLE,
+} from "./gql/gql";
 
 function App() {
   const declaration: FieldExtensionDeclaration = {
