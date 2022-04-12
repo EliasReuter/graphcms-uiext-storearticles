@@ -8,14 +8,7 @@ import {
   ExtensionPermission,
   useFieldExtension,
 } from "@graphcms/uix-react-sdk";
-import {
-  ApolloClient,
-  ApolloProvider,
-  gql,
-  InMemoryCache,
-  useMutation,
-  useQuery,
-} from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Button, TextField } from "@mui/material";
 import {
   GET_ARTICLES,
