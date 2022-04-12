@@ -9,7 +9,8 @@ import {
   createHttpLink,
   InMemoryCache,
 } from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
 
 const baseURL = "https://api-eu-central-1.graphcms.com/v2/";
 const apiKey = "cl1eyp2gh2pc901z7amoq8axs";
@@ -32,7 +33,9 @@ const client = new ApolloClient({
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")

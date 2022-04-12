@@ -19,6 +19,7 @@ import {
   useMutation,
   useQuery,
 } from "@apollo/client";
+import { Button, TextField } from "@mui/material";
 
 const declaration: FieldExtensionDeclaration = {
   extensionType: "field",
@@ -80,70 +81,123 @@ function App() {
     permissions: [ExtensionPermission.INPUT],
   };
 
-  const { data, refetch } = useQuery(GET_ARTICLES);
+  const { data, refetch } = useQuery(GET_ARTICLES, { pollInterval: 500 });
   const [createStoreArticle] = useMutation(CREATE_STOREARTICLES);
   const [publishStoreArticle, { loading, error }] =
     useMutation(PUBLISH_STOREARTICLE);
   const [unpublishStoreArticle] = useMutation(UNPUBLISH_STOREARTICLE);
 
   const [storeArticleId, setStoreArticleId] = useState("asd");
+  const [disablePublish, setDisablePublish] = useState(true);
+
+  const [_storeId, setStoreId] = useState(-1);
+  const [_articleId, setArticleId] = useState(-1);
+
+  const [disableInputs, setDisableInputs] = useState(false);
+
+  useEffect(() => {
+    refetch();
+  });
 
   return (
-    <>
-      <button
-        onClick={() => {
-          refetch();
-          console.log(data);
-        }}
-      >
-        Get Store Articles
-      </button>
-      <br />
-      <button
-        onClick={() =>
-          createStoreArticle({
-            variables: { articleId: 2, storeId: 2 },
-          }).then((result) => {
-            console.log(result);
-            setStoreArticleId(result.data.createStoreArticle.id);
-          })
-        }
-      >
-        Create Store Article
-      </button>
-      <br />
-      <button
-        onClick={() => {
-          console.log(storeArticleId);
-          publishStoreArticle({ variables: { sAID: storeArticleId } }).then(
-            (result) => console.log(result)
-          );
-        }}
-      >
-        Publish Store Article
-      </button>
-      <br />
-      <button
-        onClick={() => {
-          console.log(storeArticleId);
-          unpublishStoreArticle({ variables: { sAID: storeArticleId } }).then(
-            (result) => console.log(result)
-          );
-        }}
-      >
-        Unpublish Store Article
-      </button>
+    <div className={"ml-10"}>
+      <p className={"text-5xl mt-10"}>STORE ARTICLES</p>
+      <p className={"text-2xl mt-6"}>GraphCMS</p>
+      <div className={"mt-5"}>
+        <TextField
+          label={"StoreID"}
+          type="number"
+          disabled={disableInputs}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          onChange={(evt) => {
+            setStoreId(Number(evt.target.value));
+          }}
+        ></TextField>
+        <TextField
+          label={"ArticleID"}
+          type="number"
+          disabled={disableInputs}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          onChange={(evt) => {
+            setArticleId(Number(evt.target.value));
+          }}
+        ></TextField>
+      </div>
+      <div className={"flex gap-3 mt-5 mb-10"}>
+        <Button
+          variant="contained"
+          disabled={!disablePublish}
+          onClick={() => {
+            if (_storeId === -1 || _articleId === -1) {
+              alert("Please complete all the Fields");
+              return;
+            }
+            setDisablePublish(false);
+            setDisableInputs(true);
+            try {
+              createStoreArticle({
+                variables: {
+                  articleId: _storeId,
+                  storeId: _articleId,
+                },
+              }).then((result) => {
+                setStoreArticleId(result.data.createStoreArticle.id);
+              });
+            } catch (ex) {
+              alert("Error while trying to create Store Article");
+            }
+          }}
+        >
+          Create Store Article
+        </Button>
+        <Button
+          variant="contained"
+          disabled={disablePublish}
+          onClick={() => {
+            setDisablePublish(true);
+            setDisableInputs(false);
+            try {
+              publishStoreArticle({ variables: { sAID: storeArticleId } }).then(
+                (result) => console.log(result)
+              );
+            } catch (ex) {
+              alert("Error while trying to publish the Store Article");
+            }
+          }}
+        >
+          Publish Store Article
+        </Button>
+        <Button
+          variant="contained"
+          disabled={true}
+          onClick={() => {
+            unpublishStoreArticle({ variables: { sAID: storeArticleId } }).then(
+              (result) => console.log(result)
+            );
+          }}
+        >
+          Unpublish Store Article
+        </Button>
+      </div>
       {/*<Wrapper declaration={declaration}></Wrapper>*/}
-      <br />
-      {data?.storeArticles?.map((x: any, index: number) => (
-        <>
-          <input value={"Store Article #" + index.toString()} />
-          <input value={x.storeId} />
-          <input value={x.storeId} />
-          <br />
-        </>
-      ))}
-    </>
+      <div className={"ml-10"}>
+        <div className={"flex gap-[115px] ml-2"}>
+          <p> Store Article # </p>
+          <p> Article ID </p>
+          <p> Store ID </p>
+        </div>
+        {data?.storeArticles?.map((x: any, index: number) => (
+          <div className={"flex gap-2"}>
+            <TextField
+              disabled={true}
+              value={"Store Article #" + index.toString()}
+            />
+            <TextField disabled={true} value={x.storeId} />
+            <TextField disabled={true} value={x.storeId} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
