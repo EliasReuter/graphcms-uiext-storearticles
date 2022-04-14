@@ -9,7 +9,7 @@ import {
   useFieldExtension,
 } from "@graphcms/uix-react-sdk";
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Checkbox, TextField } from "@mui/material";
+import { Box, Button, Checkbox, Modal, TextField } from "@mui/material";
 import {
   GET_ARTICLES,
   CREATE_STOREARTICLES,
@@ -49,12 +49,16 @@ function App() {
   const [_description, setDescription] = useState("");
   const [_comingSoon, setComingSoon] = useState(false);
   const _stores: number[] = [];
+  const [log, setLog] = useState("");
+  const [logColor, setLogColor] = useState("text-red-600");
 
-  const [disableArticleInputs, setDisableArticleInputs] = useState(false);
+  const [open, setOpen] = React.useState(false);
+
+  const [disableArticleInputs, setDisableArticleInputs] = useState(true);
+  const [disableStoreArticleInputs, setDisableStoreArticleInputs] =
+    useState(true);
 
   data?.stores?.map((store: any) => _stores.push(store.storeId));
-
-  console.log(_stores);
 
   useEffect(() => {
     refetch();
@@ -91,11 +95,27 @@ function App() {
     ],
   ];
 
+  function setLogText(text: string, color: string) {
+    setLog(text);
+    setLogColor(color);
+  }
+
   return (
     <Wrapper declaration={declaration}>
       <div className={"ml-10 mr-10"}>
-        <p className={"text-5xl mt-10"}>STORE ARTICLES</p>
-        <p className={"text-2xl mt-6"}>GraphCMS</p>
+        <div className={"mb-5"}>
+          <p className={"text-5xl mt-10"}>STORE ARTICLES</p>
+          <p className={"text-2xl mt-6"}>GraphCMS</p>
+          <p className={logColor}>{log}</p>
+        </div>
+        <Button
+          disabled={!disableArticleInputs || !disableStoreArticleInputs}
+          onClick={() => {
+            setDisableArticleInputs(false);
+          }}
+        >
+          + Add Article
+        </Button>
         <div>
           {articleFields.map((row) => {
             return (
@@ -132,27 +152,68 @@ function App() {
             variant="contained"
             disabled={disableArticleInputs}
             onClick={() => {
-              try {
-                createArticle({
-                  variables: {
-                    articleId: Number(_articleId),
-                    ageRestriction: Number(_ageRestriction),
-                    price: Number(_price),
-                    name: _name,
-                    description: _description,
-                  },
-                }).then((result) => {
+              if (_articleId === -1) {
+                setLog("Please complete Article Id field");
+                return;
+              }
+              if (_name === "") {
+                setLog("Please complete Name field");
+                return;
+              }
+              if (_description === "") {
+                setLogText("Please complete Description field", "text-red-600");
+                return;
+              }
+              if (_ageRestriction === -1) {
+                setLogText(
+                  "Please complete Age Restriction field",
+                  "text-red-600"
+                );
+                return;
+              }
+              if (_price === -1) {
+                setLog("Please complete Price field");
+                return;
+              }
+              createArticle({
+                variables: {
+                  articleId: Number(_articleId),
+                  ageRestriction: Number(_ageRestriction),
+                  price: Number(_price),
+                  name: _name,
+                  description: _description,
+                },
+              })
+                .then((result) => {
+                  setLogText(
+                    "Successful creation of Article",
+                    "text-green-600"
+                  );
                   setRealArticleId(result.data.createArticle.id);
                   publishArticle({
                     variables: { articleId: articleId },
-                  }).then((result) => {
-                    console.log(result);
-                    setDisableArticleInputs(true);
-                  });
+                  })
+                    .then((result) => {
+                      setLogText(
+                        "Successful publishing of Article",
+                        "text-green-600"
+                      );
+                      setDisableStoreArticleInputs(false);
+                      setDisableArticleInputs(true);
+                    })
+                    .catch((reason) => {
+                      setLogText(
+                        "Error while trying to publish Article",
+                        "text-red-600"
+                      );
+                    });
+                })
+                .catch((reason) => {
+                  setLogText(
+                    "Error while trying to create Article",
+                    "text-red-600"
+                  );
                 });
-              } catch (ex) {
-                alert("Error while trying to create Store Article");
-              }
             }}
           >
             Create Article
@@ -164,7 +225,7 @@ function App() {
             {data?.stores?.map((x: any, index: number) => (
               <div className={"mb-5"}>
                 <Checkbox
-                  disabled={!disableArticleInputs}
+                  disabled={disableStoreArticleInputs}
                   key={x.storeId}
                   checked={true}
                   onChange={(ev) => {
@@ -177,28 +238,42 @@ function App() {
           </div>
           <Button
             variant="contained"
-            disabled={!disableArticleInputs}
+            disabled={disableStoreArticleInputs}
             onClick={() => {
-              try {
-                _stores.map((str) => {
-                  createStoreArticle({
-                    variables: {
-                      articleId: Number(_articleId),
-                      storeId: str,
-                    },
-                  }).then((result) => {
-                    console.log(result);
+              _stores.map((str) => {
+                createStoreArticle({
+                  variables: {
+                    articleId: Number(_articleId),
+                    storeId: str,
+                  },
+                })
+                  .then((result) => {
                     publishStoreArticle({
                       variables: { sAID: result.data.createStoreArticle.id },
-                    }).then((result) => {
-                      setDisableArticleInputs(false);
-                      console.log(result);
-                    });
+                    })
+                      .then((result) => {
+                        setLogText(
+                          "Successful creation of Store Articles",
+                          "text-black"
+                        );
+                        setOpen(true);
+                        setDisableStoreArticleInputs(true);
+                        setDisableArticleInputs(true);
+                      })
+                      .catch((reason) => {
+                        setLogText(
+                          "Error while trying to publish Store Articles",
+                          "text-red-600"
+                        );
+                      });
+                  })
+                  .catch((reason) => {
+                    setLogText(
+                      "Error while trying to create Store Articles",
+                      "text-red-600"
+                    );
                   });
-                });
-              } catch (ex) {
-                alert("Error while trying to create the Store Article");
-              }
+              });
             }}
           >
             Add Article to Stores
