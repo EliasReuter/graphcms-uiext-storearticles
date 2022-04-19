@@ -43,29 +43,23 @@ function App() {
   const [createArticle] = useMutation(CREATE_ARTICLE);
   const [publishStoreArticle] = useMutation(PUBLISH_STOREARTICLE);
   const [publishArticle, { loading, error }] = useMutation(PUBLISH_ARTICLE);
-  const [unpublishStoreArticle] = useMutation(UNPUBLISH_STOREARTICLE);
 
-  const [storeArticleId, setStoreArticleId] = useState("asd");
-  const [disablePublish, setDisablePublish] = useState(true);
-
-  const [_storeId, setStoreId] = useState(-1);
   const [_articleId, setArticleId] = useState(-1);
-  const [articleId, setRealArticleId] = useState(-1);
+  const [realArticleId, setRealArticleId] = useState(-1);
   const [_ageRestriction, setAgeRestriction] = useState(-1);
   const [_price, setPrice] = useState(-1);
   const [_name, setName] = useState("");
   const [_description, setDescription] = useState("");
   const [_comingSoon, setComingSoon] = useState(false);
-  const _stores: number[] = [];
+
   const [log, setLog] = useState("");
   const [logColor, setLogColor] = useState("text-red-600");
-
   const [open, setOpen] = React.useState(false);
-
   const [disableArticleInputs, setDisableArticleInputs] = useState(true);
   const [disableStoreArticleInputs, setDisableStoreArticleInputs] =
     useState(true);
 
+  const _stores: number[] = [];
   data?.stores?.map((store: any) => _stores.push(store.storeId));
 
   useEffect(() => {
@@ -74,11 +68,17 @@ function App() {
 
   const articleFields = [
     [
-      { label: "Name", type: "autocomplete", func: (val: any) => setName(val) },
+      {
+        label: "Name",
+        type: "text",
+        func: (val: any) => setName(val),
+        value: _name,
+      },
       {
         label: "Article ID",
         type: "number",
         func: (val: any) => setArticleId(val),
+        value: _articleId,
       },
     ],
     [
@@ -86,6 +86,7 @@ function App() {
         label: "Description",
         type: "text",
         func: (val: any) => setDescription(val),
+        value: _description,
       },
     ],
     [
@@ -93,12 +94,19 @@ function App() {
         label: "Age Restriction",
         type: "number",
         func: (val: any) => setAgeRestriction(val),
+        value: _ageRestriction,
       },
-      { label: "Price", type: "number", func: (val: any) => setPrice(val) },
+      {
+        label: "Price",
+        type: "number",
+        func: (val: any) => setPrice(val),
+        value: _price,
+      },
       {
         label: "Coming soon",
         type: "boolean",
         func: (val: any) => setComingSoon(val),
+        value: _comingSoon,
       },
     ],
   ];
@@ -108,18 +116,21 @@ function App() {
     setLogColor(color);
   }
 
-  console.log(data);
+  const clearFields = () => {
+    articleFields.forEach((row) => {
+      row.forEach((article) => {
+        if (typeof article.value === "boolean") {
+          article.func(false);
+        } else if (typeof article.value === "string") {
+          article.func("");
+        } else {
+          article.func(null);
+        }
+      });
+    });
+  };
 
-  const filter = createFilterOptions<string>();
-
-  const articleNames: string[] = data?.articles?.map(
-    (x: { name: String }) => x.name
-  );
-
-  const [autocompleteValue, setAutocompleteValue] = React.useState<
-    string | null
-  >(null);
-
+  //
   return (
     <Wrapper declaration={declaration}>
       <div className={"ml-10 mr-10"}>
@@ -152,19 +163,6 @@ function App() {
                         />
                       </div>
                     );
-                  } else if (article.type === "autocomplete") {
-                    return (
-                      <TextField
-                        label={article.label}
-                        onChange={(ev) => article.func(ev.target.value)}
-                        type={article.type}
-                        fullWidth={true}
-                        disabled={disableArticleInputs}
-                        multiline={row.length === 1}
-                        rows={4}
-                        key={article.label}
-                      />
-                    );
                   } else {
                     return (
                       <TextField
@@ -176,6 +174,7 @@ function App() {
                         multiline={row.length === 1}
                         rows={4}
                         onChange={(ev) => article.func(ev.target.value)}
+                        value={article.value}
                       />
                     );
                   }
@@ -227,8 +226,9 @@ function App() {
                     "text-green-600"
                   );
                   setRealArticleId(result.data.createArticle.id);
+                  console.log(result);
                   publishArticle({
-                    variables: { articleId: articleId },
+                    variables: { articleId: result.data.createArticle.id },
                   })
                     .then((result) => {
                       setLogText(
@@ -289,13 +289,18 @@ function App() {
                       variables: { sAID: result.data.createStoreArticle.id },
                     })
                       .then((result) => {
-                        setLogText(
-                          "Successful creation of Store Articles",
-                          "text-black"
-                        );
-                        setOpen(true);
-                        setDisableStoreArticleInputs(true);
-                        setDisableArticleInputs(true);
+                        publishArticle({
+                          variables: { articleId: realArticleId },
+                        }).then((result) => {
+                          setLogText(
+                            "Successful creation of Store Articles",
+                            "text-black"
+                          );
+                          setOpen(true);
+                          setDisableStoreArticleInputs(true);
+                          setDisableArticleInputs(true);
+                          clearFields();
+                        });
                       })
                       .catch((reason) => {
                         setLogText(
@@ -319,7 +324,6 @@ function App() {
       </div>
     </Wrapper>
   );
-  //
 }
 
 export default App;
